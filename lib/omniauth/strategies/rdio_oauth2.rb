@@ -1,14 +1,15 @@
 require 'omniauth-oauth2'
+require 'net/http'
 require 'multi_json'
 
 module OmniAuth
   module Strategies
-    class Rdio2 < OmniAuth::Strategies::OAuth2
+    class RdioOauth2 < OmniAuth::Strategies::OAuth2
 
       option :name, 'rdio_oauth2'
 
       option :client_options, {
-        site: 'https://www.rdio.com',
+        site: 'https://www.rdio.com/api/1/',
         authorize_url: 'https://www.rdio.com/oauth2/authorize',
         token_url: 'https://www.rdio.com/oauth2/token'
       }
@@ -33,17 +34,9 @@ module OmniAuth
       EXTRAS = 'email,followingUrl,isTrial,artistCount,heavyRotationKey,networkHeavyRotationKey,albumCount,trackCount,username,collectionUrl,playlistsUrl,collectionKey,followersUrl,displayName,isUnlimited,isSubscriber'
 
       def user_data
-
-        access_token.options[:mode] = :query
-        @user_data ||=
-          begin
-            json = access_token.post('https://www.rdio.com/api/1/',
-                                       method: 'currentUser',
-                                       extras: EXTRAS).body
-            MultiJson.decode(json)['result']
-          end
-      rescue ::Errno::ETIMEDOUT
-        raise ::TimeoutError::Error
+        uri = URI('https://www.rdio.com/api/1/')
+        res = Net::HTTP.post_form(uri, 'method' => 'currentUser', 'extras' => EXTRAS, 'access_token' => access_token.token)
+        @user_data ||= MultiJson.decode(res.body)['result']
       end
     end
   end
