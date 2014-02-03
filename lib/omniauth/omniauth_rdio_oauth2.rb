@@ -1,0 +1,1 @@
+require 'omniauth/strategies/rdio_oauth2'
