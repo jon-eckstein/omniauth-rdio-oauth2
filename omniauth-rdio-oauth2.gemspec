@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = 'omniauth-rdio-oauth2'
-  gem.version       = '0.1.0'
+  gem.version       = '0.1.1'
   gem.author        = 'Robert Long'
   gem.email         = 'robert@robertlong.me'
   gem.license       = 'MIT'
