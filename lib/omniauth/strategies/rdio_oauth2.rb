@@ -34,9 +34,14 @@ module OmniAuth
       EXTRAS = 'email,followingUrl,isTrial,artistCount,heavyRotationKey,networkHeavyRotationKey,albumCount,trackCount,username,collectionUrl,playlistsUrl,collectionKey,followersUrl,displayName,isUnlimited,isSubscriber'
 
       def user_data
-        uri = URI('https://www.rdio.com/api/1/')
-        res = Net::HTTP.post_form(uri, 'method' => 'currentUser', 'extras' => EXTRAS, 'access_token' => access_token.token)
-        @user_data ||= MultiJson.decode(res.body)['result']
+        @user_data ||= begin
+          resp = access_token.post('https://www.rdio.com/api/1/',
+                                   body: {
+                                       :method => 'currentUser',
+                                       :extras => EXTRAS
+                                   })
+          MultiJson.decode(resp.body)['result']
+        end
       end
     end
   end
